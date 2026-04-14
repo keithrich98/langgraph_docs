@@ -52,7 +52,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           path: langgraph_docs
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SYNC_PR_TOKEN }}
           branch: sync/langgraph-docs
           base: main
           title: "chore: sync langgraph docs from langchain-ai/docs"
