@@ -1,0 +1,65 @@
+name: Sync docs from langchain-ai/docs
+
+on:
+  schedule:
+    # Runs every day at 02:00 UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout keithrich98/langgraph_docs
+        uses: actions/checkout@v4
+        with:
+          path: langgraph_docs
+
+      - name: Sparse-checkout langchain-ai/docs
+        run: |
+          git clone --filter=blob:none --sparse \
+            https://github.com/langchain-ai/docs.git upstream-docs
+          cd upstream-docs
+          git sparse-checkout set src/oss/langgraph
+
+      - name: Copy updated docs into repo
+        run: |
+          # Sync src/oss/langgraph/ to the root of langgraph_docs,
+          # deleting files that no longer exist upstream, but preserve
+          # repository-owned paths that are not part of the upstream docs.
+          rsync -av --delete \
+            --exclude='.github/' \
+            --exclude='.git/' \
+            upstream-docs/src/oss/langgraph/ \
+            langgraph_docs/
+
+      - name: Check for changes
+        id: diff
+        working-directory: langgraph_docs
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          path: langgraph_docs
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: sync/langgraph-docs
+          base: main
+          title: "chore: sync langgraph docs from langchain-ai/docs"
+          body: |
+            Automated sync of `src/oss/langgraph/` from
+            [langchain-ai/docs](https://github.com/langchain-ai/docs/tree/main/src/oss/langgraph).
+
+            This PR was created automatically by the **Sync docs** workflow.
+          commit-message: "chore: sync langgraph docs from langchain-ai/docs"
+          labels: automated-sync
