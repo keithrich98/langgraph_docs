@@ -125,9 +125,9 @@ for await (const chunk of streamResponse) {
 curl -s --request POST \
     --url <DEPLOYMENT_URL>/runs/stream \
     --header 'Content-Type: application/json' \
-    --header "X-Api-Key: <LANGSMITH API KEY> \
+    --header "X-Api-Key: <LANGSMITH API KEY>" \
     --data "{
-        \"assistant_id\": \"agent\", `# Name of agent. Defined in langgraph.json.`
+        \"assistant_id\": \"agent\",
         \"input\": {
             \"messages\": [
                 {

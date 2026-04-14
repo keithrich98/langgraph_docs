@@ -850,7 +850,7 @@ display(Image(graph.get_graph().draw_mermaid_png()))
 ```typescript
 import { StateGraph, START, END, ConditionalEdgeRouter } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { AIMessage } from "langchain";
+import { AIMessage } from "@langchain/core/messages";
 
 // Create a ToolNode for the retriever
 const toolNode = new ToolNode(tools);
@@ -865,7 +865,7 @@ const shouldRetrieve: ConditionalEdgeRouter<typeof State, "retrieve"> = (state) 
 }
 
 // Define the graph
-const builder = new StateGraph(GraphState)
+const builder = new StateGraph(State)
   .addNode("generateQueryOrRespond", generateQueryOrRespond)
   .addNode("retrieve", toolNode)
   .addNode("gradeDocuments", gradeDocuments)

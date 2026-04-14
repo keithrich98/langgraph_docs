@@ -19,7 +19,7 @@ Before you begin, ensure you have the following:
 
 To enable tracing for your application, set the following environment variables:
 
-```python
+```bash
 export LANGSMITH_TRACING=true
 export LANGSMITH_API_KEY=<your-api-key>
 ```
@@ -150,7 +150,7 @@ await agent.invoke(
   {
     messages: [{role: "user", content: "Send a test email to alice@example.com"}]
   },
-  config: {
+  {
     tags: ["production", "email-assistant", "v1.0"],
     metadata: {
       userId: "user123",

@@ -29,8 +29,11 @@ jobs:
       - name: Copy updated docs into repo
         run: |
           # Sync src/oss/langgraph/ to the root of langgraph_docs,
-          # deleting files that no longer exist upstream.
+          # deleting files that no longer exist upstream, but preserve
+          # repository-owned paths that are not part of the upstream docs.
           rsync -av --delete \
+            --exclude='.github/' \
+            --exclude='.git/' \
             upstream-docs/src/oss/langgraph/ \
             langgraph_docs/
 
@@ -38,9 +41,11 @@ jobs:
         id: diff
         working-directory: langgraph_docs
         run: |
-          git diff --quiet && git diff --cached --quiet \
-            && echo "changed=false" >> "$GITHUB_OUTPUT" \
-            || echo "changed=true" >> "$GITHUB_OUTPUT"
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Create Pull Request
         if: steps.diff.outputs.changed == 'true'
