@@ -1,5 +1,8 @@
 name: Sync docs from langchain-ai/docs
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   schedule:
     # Runs every day at 02:00 UTC
